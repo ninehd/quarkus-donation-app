@@ -19,10 +19,10 @@ public class Donation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "donor_name", nullable = false)
     private String donorName;
 
-    @Column(nullable = false)
+    @Column(name = "donor_email", nullable = false)
     private String donorEmail;
 
     @Column(nullable = false)
@@ -34,7 +34,7 @@ public class Donation {
     @Embedded
     private PayPalTransactionInfo paypalInfo = new PayPalTransactionInfo();
 
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(name = "updated_at")
