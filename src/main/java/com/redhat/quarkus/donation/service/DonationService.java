@@ -6,6 +6,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.jboss.logging.Logger;
+
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -132,5 +134,22 @@ public class DonationService {
     public void deleteDonation(Long id) {
         log.infof("Deleting donation %d", id);
         donationRepository.deleteById(id);
+    }
+
+    /**
+     * Count total donations
+     */
+    public long countDonations() {
+        return donationRepository.count();
+    }
+
+    /**
+     * Get total amount donated
+     */
+    public BigDecimal getTotalAmount() {
+        List<Donation> donations = donationRepository.listAll();
+        return donations.stream()
+                .map(Donation::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }
