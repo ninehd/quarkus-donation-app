@@ -8,8 +8,11 @@ import com.redhat.quarkus.donation.integration.paypal.PayPalOrderResponse;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.logging.Logger;
+
+import java.util.Collections;
 
 @ApplicationScoped
 public class PayPalService {
@@ -23,6 +26,9 @@ public class PayPalService {
     @Inject
     DonationService donationService;
 
+    @ConfigProperty(name = "app.base-url")
+    String baseUrl;
+
     /**
      * Initiate a donation by creating a PayPal order
      */
@@ -34,10 +40,15 @@ public class PayPalService {
                 .orElseThrow(() -> new RuntimeException("Donation not found: " + donationId));
 
         try {
+            String returnUrl = baseUrl + "/donations/paypal/return";
+            String cancelUrl = baseUrl + "/donations/paypal/return";
+
             PayPalOrderRequest request = new PayPalOrderRequest(
                     donation.getAmount().toString(),
                     "USD",
-                    donation.getDonorEmail()
+                    donation.getDonorEmail(),
+                    returnUrl,
+                    cancelUrl
             );
 
             PayPalOrderResponse response = paypalClient.createOrder(request);
@@ -68,20 +79,13 @@ public class PayPalService {
                 .orElseThrow(() -> new RuntimeException("Donation not found: " + donationId));
 
         try {
-            PayPalCaptureResponse captureResponse = paypalClient.captureOrder(paypalOrderId);
+            PayPalCaptureResponse captureResponse = paypalClient.captureOrder(paypalOrderId, Collections.emptyMap());
 
             if (captureResponse != null && captureResponse.getId() != null) {
-                PayPalOrderResponse orderDetails = paypalClient.getOrder(paypalOrderId);
-
-                String paypalEmail = "unknown";
-                if (orderDetails != null) {
-                    paypalEmail = donation.getDonorEmail();
-                }
-
                 Donation captured = donationService.captureDonation(
                         donationId,
                         captureResponse.getId(),
-                        paypalEmail,
+                        donation.getDonorEmail(),
                         paypalOrderId
                 );
 
@@ -100,36 +104,24 @@ public class PayPalService {
     }
 
     /**
-     * Check donation payment status
+     * Get PayPal order details
      */
-    public Donation checkPaymentStatus(Long donationId, String paypalOrderId) {
-        log.infof("Checking payment status for donation %d", donationId);
-
-        Donation donation = donationService.getDonationById(donationId)
-                .orElseThrow(() -> new RuntimeException("Donation not found: " + donationId));
+    public PayPalOrderResponse getOrderDetails(String paypalOrderId) {
+        log.infof("Fetching PayPal order details for order %s", paypalOrderId);
 
         try {
             PayPalOrderResponse orderDetails = paypalClient.getOrder(paypalOrderId);
 
             if (orderDetails != null) {
                 log.infof("PayPal order status: %s", orderDetails.getStatus());
-                return donation;
+                return orderDetails;
             } else {
                 throw new RuntimeException("Could not fetch order details from PayPal");
             }
 
         } catch (Exception e) {
-            log.errorf("Error checking payment status: %s", e.getMessage());
-            throw new RuntimeException("Failed to check payment status", e);
+            log.errorf("Error fetching order details: %s", e.getMessage());
+            throw new RuntimeException("Failed to fetch order details", e);
         }
-    }
-
-    /**
-     * Cancel a donation
-     */
-    @Transactional
-    public Donation cancelDonation(Long donationId) {
-        log.infof("Cancelling donation %d", donationId);
-        return donationService.failDonation(donationId, "Donation cancelled by user");
     }
 }

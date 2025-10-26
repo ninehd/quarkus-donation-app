@@ -1,6 +1,7 @@
 package com.redhat.quarkus.donation.dto;
 
 import com.redhat.quarkus.donation.entity.Donation;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -45,7 +46,7 @@ public class DonationDTO {
         dto.donorEmail = donation.getDonorEmail();
         dto.amount = donation.getAmount();
         dto.message = donation.getMessage();
-        
+
         dto.paypalOrderId = donation.getPaypalInfo().getOrderId();
         dto.paypalTransactionId = donation.getPaypalInfo().getTransactionId();
         dto.paypalEmail = donation.getPaypalInfo().getEmail();
@@ -53,7 +54,7 @@ public class DonationDTO {
         dto.paypalCurrency = donation.getPaypalInfo().getCurrency();
         dto.paypalStatus = donation.getPaypalInfo().getStatus();
         dto.paypalErrorMessage = donation.getPaypalInfo().getErrorMessage();
-        
+
         dto.createdAt = donation.getCreatedAt();
         dto.updatedAt = donation.getUpdatedAt();
         return dto;
@@ -65,47 +66,117 @@ public class DonationDTO {
         return donation;
     }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public String getDonorName() { return donorName; }
-    public void setDonorName(String donorName) { this.donorName = donorName; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public String getDonorEmail() { return donorEmail; }
-    public void setDonorEmail(String donorEmail) { this.donorEmail = donorEmail; }
+    public String getDonorName() {
+        return donorName;
+    }
 
-    public BigDecimal getAmount() { return amount; }
-    public void setAmount(BigDecimal amount) { this.amount = amount; }
+    public void setDonorName(String donorName) {
+        this.donorName = donorName;
+    }
 
-    public String getMessage() { return message; }
-    public void setMessage(String message) { this.message = message; }
+    public String getDonorEmail() {
+        return donorEmail;
+    }
 
-    public String getPaypalOrderId() { return paypalOrderId; }
-    public void setPaypalOrderId(String paypalOrderId) { this.paypalOrderId = paypalOrderId; }
+    public void setDonorEmail(String donorEmail) {
+        this.donorEmail = donorEmail;
+    }
 
-    public String getPaypalTransactionId() { return paypalTransactionId; }
-    public void setPaypalTransactionId(String paypalTransactionId) { this.paypalTransactionId = paypalTransactionId; }
+    public BigDecimal getAmount() {
+        return amount;
+    }
 
-    public String getPaypalEmail() { return paypalEmail; }
-    public void setPaypalEmail(String paypalEmail) { this.paypalEmail = paypalEmail; }
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
 
-    public BigDecimal getPaypalAmount() { return paypalAmount; }
-    public void setPaypalAmount(BigDecimal paypalAmount) { this.paypalAmount = paypalAmount; }
+    public String getMessage() {
+        return message;
+    }
 
-    public String getPaypalCurrency() { return paypalCurrency; }
-    public void setPaypalCurrency(String paypalCurrency) { this.paypalCurrency = paypalCurrency; }
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
-    public String getPaypalStatus() { return paypalStatus; }
-    public void setPaypalStatus(String paypalStatus) { this.paypalStatus = paypalStatus; }
+    public String getPaypalOrderId() {
+        return paypalOrderId;
+    }
 
-    public String getPaypalErrorMessage() { return paypalErrorMessage; }
-    public void setPaypalErrorMessage(String paypalErrorMessage) { this.paypalErrorMessage = paypalErrorMessage; }
+    public void setPaypalOrderId(String paypalOrderId) {
+        this.paypalOrderId = paypalOrderId;
+    }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public String getPaypalTransactionId() {
+        return paypalTransactionId;
+    }
 
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+    public void setPaypalTransactionId(String paypalTransactionId) {
+        this.paypalTransactionId = paypalTransactionId;
+    }
+
+    public String getPaypalEmail() {
+        return paypalEmail;
+    }
+
+    public void setPaypalEmail(String paypalEmail) {
+        this.paypalEmail = paypalEmail;
+    }
+
+    public BigDecimal getPaypalAmount() {
+        return paypalAmount;
+    }
+
+    public void setPaypalAmount(BigDecimal paypalAmount) {
+        this.paypalAmount = paypalAmount;
+    }
+
+    public String getPaypalCurrency() {
+        return paypalCurrency;
+    }
+
+    public void setPaypalCurrency(String paypalCurrency) {
+        this.paypalCurrency = paypalCurrency;
+    }
+
+    public String getPaypalStatus() {
+        return paypalStatus;
+    }
+
+    public void setPaypalStatus(String paypalStatus) {
+        this.paypalStatus = paypalStatus;
+    }
+
+    public String getPaypalErrorMessage() {
+        return paypalErrorMessage;
+    }
+
+    public void setPaypalErrorMessage(String paypalErrorMessage) {
+        this.paypalErrorMessage = paypalErrorMessage;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 
     @Override
     public String toString() {

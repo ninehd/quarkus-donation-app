@@ -13,6 +13,9 @@ public class PayPalOrderRequest {
     @JsonProperty("payer")
     private Payer payer;
 
+    @JsonProperty("application_context")
+    private ApplicationContext applicationContext;
+
     public PayPalOrderRequest() {}
 
     public PayPalOrderRequest(String amount, String currency, String email) {
@@ -20,6 +23,14 @@ public class PayPalOrderRequest {
         this.purchaseUnits = new PurchaseUnit[]{
             new PurchaseUnit(amount, currency)
         };
+    }
+
+    public PayPalOrderRequest(String amount, String currency, String email, String returnUrl, String cancelUrl) {
+        this.payer = new Payer(email);
+        this.purchaseUnits = new PurchaseUnit[]{
+            new PurchaseUnit(amount, currency)
+        };
+        this.applicationContext = new ApplicationContext(returnUrl, cancelUrl);
     }
 
     // Getters
@@ -59,6 +70,20 @@ public class PayPalOrderRequest {
         public Payer() {}
         public Payer(String emailAddress) {
             this.emailAddress = emailAddress;
+        }
+    }
+
+    public static class ApplicationContext {
+        @JsonProperty("return_url")
+        public String returnUrl;
+
+        @JsonProperty("cancel_url")
+        public String cancelUrl;
+
+        public ApplicationContext() {}
+        public ApplicationContext(String returnUrl, String cancelUrl) {
+            this.returnUrl = returnUrl;
+            this.cancelUrl = cancelUrl;
         }
     }
 }

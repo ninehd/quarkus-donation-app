@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{#if success}Donation Successful{#else}Donation Cancelled{/if}</title>
+    <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div class="result-container {#if success}success{#else}cancelled{/if}">
+    {#if success}
+        <div class="icon">✅</div>
+        <h1>Thank you for your donation!</h1>
+        <p>Your donation has been successfully processed.</p>
+
+        <div class="info">
+            <div class="info-row">
+                <span class="label">Donation ID:</span>
+                <span>{donationId}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Amount:</span>
+                <span>${amount} USD</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Email:</span>
+                <span>{email}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Name:</span>
+                <span>{name}</span>
+            </div>
+        </div>
+
+        <p>A confirmation email has been sent to {email}.</p>
+        <a href="/">Make another donation</a>
+    {#else}
+        <div class="icon">❌</div>
+        <h1>Donation Cancelled</h1>
+        <p>Your donation was not completed.</p>
+
+        {#if reason}
+            <div class="info">
+                <div class="info-row">
+                    <span class="label">Reason:</span>
+                    <span>{reason}</span>
+                </div>
+            </div>
+        {/if}
+
+        <p>No charges have been made to your account.</p>
+        <a href="/">Return to donation form</a>
+    {/if}
+</div>
+</body>
+</html>

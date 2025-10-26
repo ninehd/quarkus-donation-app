@@ -103,3 +103,80 @@ button:hover {
     color: #666;
     margin-top: 10px;
 }
+
+/* Result page (success/cancel) */
+.result-container {
+    background: white;
+    border: 2px solid #ddd;
+    padding: 40px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.result-container.success {
+    border-color: #28a745;
+    background: #f0f9f7;
+}
+
+.result-container.cancelled {
+    border-color: #dc3545;
+    background: #fff5f5;
+}
+
+.result-container .icon {
+    font-size: 60px;
+    margin-bottom: 20px;
+}
+
+.result-container h1 {
+    margin-bottom: 15px;
+}
+
+.result-container.success h1 {
+    color: #28a745;
+}
+
+.result-container.cancelled h1 {
+    color: #dc3545;
+}
+
+.result-container p {
+    color: #666;
+    margin: 10px 0;
+}
+
+.info {
+    background: white;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 4px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.info-row {
+    margin: 12px 0;
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.label {
+    font-weight: bold;
+    color: #333;
+}
+
+.result-container a {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 12px 30px;
+    background: #667eea;
+    color: white;
+    border-radius: 4px;
+    text-decoration: none;
+}
+
+.result-container a:hover {
+    background: #5568d3;
+    text-decoration: none;
+}

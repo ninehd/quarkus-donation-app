@@ -9,6 +9,8 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
+import java.util.Map;
+
 @RegisterRestClient(configKey = "paypal")
 @Path("/v2/checkout/orders")
 @Produces(MediaType.APPLICATION_JSON)
@@ -20,7 +22,7 @@ public interface PayPalClient {
 
     @POST
     @Path("/{id}/capture")
-    PayPalCaptureResponse captureOrder(@PathParam("id") String orderId);
+    PayPalCaptureResponse captureOrder(@PathParam("id") String orderId, Map<String, Object> body);
 
     @GET
     @Path("/{id}")

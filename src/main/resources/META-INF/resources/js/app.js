@@ -42,15 +42,16 @@ if (donationForm) {
                 body: JSON.stringify(formData)
             });
 
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Error initiating donation');
+            }
+
+            // Get the approval URL from JSON response
             const data = await response.json();
 
-            if (!response.ok) {
-                throw new Error(data.message || 'Erreur');
-            }
-
-            if (data.approvalLink) {
-                window.location.href = data.approvalLink;
-            }
+            // Redirect to PayPal
+            window.location.href = data.approvalUrl;
 
         } catch (error) {
             document.getElementById('error').textContent = error.message;
