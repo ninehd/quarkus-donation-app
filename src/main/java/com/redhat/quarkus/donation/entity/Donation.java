@@ -28,6 +28,9 @@ public class Donation {
     @Column(nullable = false)
     private BigDecimal amount;
 
+    @Column(nullable = false, length = 3)
+    private String currency = "EUR";
+
     @Column(columnDefinition = "TEXT")
     private String message;
 
@@ -80,6 +83,14 @@ public class Donation {
 
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
     }
 
     public String getMessage() {

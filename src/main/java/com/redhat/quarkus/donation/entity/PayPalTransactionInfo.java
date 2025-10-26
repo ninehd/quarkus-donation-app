@@ -2,7 +2,6 @@ package com.redhat.quarkus.donation.entity;
 
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Column;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Embeddable
@@ -17,11 +16,8 @@ public class PayPalTransactionInfo {
     @Column(name = "paypal_email")
     private String email;
 
-    @Column(name = "paypal_amount")
-    private BigDecimal amount;
-
-    @Column(name = "paypal_currency")
-    private String currency = "USD";
+    @Column(name = "paypal_payer_id")
+    private String payerId;
 
     @Column(name = "paypal_status")
     private String status;
@@ -39,11 +35,6 @@ public class PayPalTransactionInfo {
     private LocalDateTime updatedAt;
 
     public PayPalTransactionInfo() {
-    }
-
-    public PayPalTransactionInfo(String orderId, BigDecimal amount) {
-        this.orderId = orderId;
-        this.amount = amount;
     }
 
     public String getOrderId() {
@@ -70,20 +61,12 @@ public class PayPalTransactionInfo {
         this.email = email;
     }
 
-    public BigDecimal getAmount() {
-        return amount;
+    public String getPayerId() {
+        return payerId;
     }
 
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
-    public String getCurrency() {
-        return currency;
-    }
-
-    public void setCurrency(String currency) {
-        this.currency = currency;
+    public void setPayerId(String payerId) {
+        this.payerId = payerId;
     }
 
     public String getStatus() {
@@ -127,16 +110,11 @@ public class PayPalTransactionInfo {
         this.updatedAt = updatedAt;
     }
 
-    public boolean isCompleted() {
-        return "COMPLETED".equals(status);
-    }
-
     @Override
     public String toString() {
         return "PayPalTransactionInfo{" +
                 "orderId='" + orderId + '\'' +
                 ", status='" + status + '\'' +
-                ", amount=" + amount +
                 '}';
     }
 }

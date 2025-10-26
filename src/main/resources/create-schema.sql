@@ -6,19 +6,19 @@ CREATE TABLE donations
     donor_name            VARCHAR(255)   NOT NULL,
     donor_email           VARCHAR(255)   NOT NULL,
     amount                DECIMAL(19, 2) NOT NULL,
+    currency              VARCHAR(3)     NOT NULL DEFAULT 'EUR',
     message               TEXT,
+    created_at            TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at            TIMESTAMP,
     paypal_order_id       VARCHAR(255),
     paypal_transaction_id VARCHAR(255),
     paypal_email          VARCHAR(255),
-    paypal_amount         DECIMAL(19, 2),
-    paypal_currency       VARCHAR(3),
+    paypal_payer_id         VARCHAR(255),
     paypal_status         VARCHAR(50),
     paypal_response_data  TEXT,
     paypal_error_message  TEXT,
     paypal_created_at     TIMESTAMP,
     paypal_updated_at     TIMESTAMP,
-    created_at            TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at            TIMESTAMP,
 
     CONSTRAINT amount_positive CHECK (amount > 0)
 );

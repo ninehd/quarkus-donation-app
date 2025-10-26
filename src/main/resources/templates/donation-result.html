@@ -7,50 +7,74 @@
     <link rel="stylesheet" href="/css/app.css">
 </head>
 <body>
-<div class="result-container {#if success}success{#else}cancelled{/if}">
-    {#if success}
-        <div class="icon">✅</div>
-        <h1>Thank you for your donation!</h1>
-        <p>Your donation has been successfully processed.</p>
+<div class="container">
+    <div class="result-container {#if success}success{#else}cancelled{/if}">
+        {#if success}
+            <div class="result-icon success-icon">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" fill="#48bb78" opacity="0.2"/>
+                    <path d="M9 12l2 2 4-4" stroke="#48bb78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="12" cy="12" r="10" stroke="#48bb78" stroke-width="2"/>
+                </svg>
+            </div>
+            <h1>Thank You!</h1>
+            <p class="subtitle">Your donation has been successfully processed</p>
 
-        <div class="info">
-            <div class="info-row">
-                <span class="label">Donation ID:</span>
-                <span>{donationId}</span>
-            </div>
-            <div class="info-row">
-                <span class="label">Amount:</span>
-                <span>${amount} USD</span>
-            </div>
-            <div class="info-row">
-                <span class="label">Email:</span>
-                <span>{email}</span>
-            </div>
-            <div class="info-row">
-                <span class="label">Name:</span>
-                <span>{name}</span>
-            </div>
-        </div>
-
-        <p>A confirmation email has been sent to {email}.</p>
-        <a href="/">Make another donation</a>
-    {#else}
-        <div class="icon">❌</div>
-        <h1>Donation Cancelled</h1>
-        <p>Your donation was not completed.</p>
-
-        {#if reason}
-            <div class="info">
+            <div class="info-card">
                 <div class="info-row">
-                    <span class="label">Reason:</span>
-                    <span>{reason}</span>
+                    <span class="label">PayPal Order ID</span>
+                    <span class="value">{orderId}</span>
+                </div>
+                <div class="info-divider"></div>
+                <div class="info-row">
+                    <span class="label">PayPal Email</span>
+                    <span class="value">{maskedEmail}</span>
+                </div>
+                <div class="info-divider"></div>
+                <div class="info-row">
+                    <span class="label">Amount</span>
+                    <span class="value highlight">{amount}€</span>
                 </div>
             </div>
-        {/if}
 
-        <p>No charges have been made to your account.</p>
-        <a href="/">Return to donation form</a>
-    {/if}
+            <p class="confirmation-text">A confirmation email has been sent to <strong>{donorEmail}</strong></p>
+
+            <a href="/" class="result-btn primary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="currentColor"/>
+                </svg>
+                Make Another Donation
+            </a>
+        {#else}
+            <div class="result-icon cancelled-icon">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" fill="#f56565" opacity="0.2"/>
+                    <path d="M15 9l-6 6M9 9l6 6" stroke="#f56565" stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="12" cy="12" r="10" stroke="#f56565" stroke-width="2"/>
+                </svg>
+            </div>
+            <h1>Donation Cancelled</h1>
+            <p class="subtitle">Your donation was not completed</p>
+
+            {#if reason}
+                <div class="info-card">
+                    <div class="info-row">
+                        <span class="label">Reason</span>
+                        <span class="value">{reason}</span>
+                    </div>
+                </div>
+            {/if}
+
+            <p class="confirmation-text">No charges have been made to your account</p>
+
+            <a href="/" class="result-btn secondary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Return to Donation Form
+            </a>
+        {/if}
+    </div>
 </div>
 </body>
 </html>

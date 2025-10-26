@@ -8,6 +8,7 @@ import jakarta.transaction.Transactional;
 import org.jboss.logging.Logger;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,7 +23,6 @@ public class DonationService {
     /**
      * Create a new donation
      */
-    @Transactional
     public Donation createDonation(Donation donation) {
         log.infof("Creating donation from %s for amount %s", donation.getDonorEmail(), donation.getAmount());
         donationRepository.persist(donation);
@@ -74,50 +74,37 @@ public class DonationService {
     /**
      * Update donation with PayPal order ID
      */
-    @Transactional
-    public Donation updatePaypalOrderId(Long id, String orderId) {
-        log.infof("Updating donation %d with PayPal order ID %s", id, orderId);
-        Donation donation = donationRepository.findById(id);
-        if (donation != null) {
-            donation.getPaypalInfo().setOrderId(orderId);
-            donationRepository.persist(donation);
-        }
-        return donation;
+    public void updatePaypalOrderId(Donation donation, String orderId) {
+        log.infof("PayPal order created successfully for donation %d with PayPal order ID %s", donation.getId(), orderId);
+        donation.getPaypalInfo().setOrderId(orderId);
+        donation.getPaypalInfo().setCreatedAt(LocalDateTime.now());
+        donation.getPaypalInfo().setUpdatedAt(LocalDateTime.now());
     }
+
 
     /**
      * Capture donation from PayPal
      */
-    @Transactional
-    public Donation captureDonation(Long id, String transactionId, String paypalEmail, String responseData) {
-        log.infof("Capturing donation %d with PayPal transaction %s", id, transactionId);
-        Donation donation = donationRepository.findById(id);
-        if (donation != null) {
-            donation.getPaypalInfo().setTransactionId(transactionId);
-            donation.getPaypalInfo().setEmail(paypalEmail);
-            donation.getPaypalInfo().setStatus("COMPLETED");
-            donation.getPaypalInfo().setResponseData(responseData);
-            donation.getPaypalInfo().setCreatedAt(java.time.LocalDateTime.now());
-            donation.setUpdatedAt(java.time.LocalDateTime.now());
-            donationRepository.persist(donation);
-        }
+    public Donation captureDonation(Donation donation, String transactionId, String paypalEmail, String payerId, String responseData) {
+        log.infof("Capturing donation %d with PayPal transaction %s", donation.getId(), transactionId);
+        donation.getPaypalInfo().setTransactionId(transactionId);
+        donation.getPaypalInfo().setEmail(paypalEmail);
+        donation.getPaypalInfo().setPayerId(payerId);
+        donation.getPaypalInfo().setStatus("COMPLETED");
+        donation.getPaypalInfo().setResponseData(responseData);
+        donation.getPaypalInfo().setCreatedAt(java.time.LocalDateTime.now());
+        donation.setUpdatedAt(LocalDateTime.now());
         return donation;
     }
 
     /**
      * Mark donation as failed
      */
-    @Transactional
-    public Donation failDonation(Long id, String errorMessage) {
-        log.infof("Marking donation %d as FAILED: %s", id, errorMessage);
-        Donation donation = donationRepository.findById(id);
-        if (donation != null) {
-            donation.getPaypalInfo().setStatus("FAILED");
-            donation.getPaypalInfo().setErrorMessage(errorMessage);
-            donation.setUpdatedAt(java.time.LocalDateTime.now());
-            donationRepository.persist(donation);
-        }
-        return donation;
+    public void failDonation(Donation donation, String errorMessage) {
+        log.infof("Marking donation %d as FAILED: %s", donation.getId(), errorMessage);
+        donation.getPaypalInfo().setStatus("FAILED");
+        donation.getPaypalInfo().setErrorMessage(errorMessage);
+        donation.setUpdatedAt(LocalDateTime.now());
     }
 
     /**
@@ -125,15 +112,6 @@ public class DonationService {
      */
     public long countCompletedDonations() {
         return donationRepository.countCompleted();
-    }
-
-    /**
-     * Delete donation
-     */
-    @Transactional
-    public void deleteDonation(Long id) {
-        log.infof("Deleting donation %d", id);
-        donationRepository.deleteById(id);
     }
 
     /**

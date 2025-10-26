@@ -22,7 +22,7 @@ public interface PayPalClient {
 
     @POST
     @Path("/{id}/capture")
-    PayPalCaptureResponse captureOrder(@PathParam("id") String orderId, Map<String, Object> body);
+    PayPalOrderResponse captureOrder(@PathParam("id") String orderId, Map<String, Object> body);
 
     @GET
     @Path("/{id}")

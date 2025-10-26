@@ -50,8 +50,6 @@ public class DonationDTO {
         dto.paypalOrderId = donation.getPaypalInfo().getOrderId();
         dto.paypalTransactionId = donation.getPaypalInfo().getTransactionId();
         dto.paypalEmail = donation.getPaypalInfo().getEmail();
-        dto.paypalAmount = donation.getPaypalInfo().getAmount();
-        dto.paypalCurrency = donation.getPaypalInfo().getCurrency();
         dto.paypalStatus = donation.getPaypalInfo().getStatus();
         dto.paypalErrorMessage = donation.getPaypalInfo().getErrorMessage();
 
