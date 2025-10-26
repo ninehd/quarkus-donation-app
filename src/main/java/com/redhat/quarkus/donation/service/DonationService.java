@@ -4,13 +4,13 @@ import com.redhat.quarkus.donation.entity.Donation;
 import com.redhat.quarkus.donation.repository.DonationRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import org.jboss.logging.Logger;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @ApplicationScoped
 public class DonationService {
@@ -30,41 +30,6 @@ public class DonationService {
     }
 
     /**
-     * Get donation by ID
-     */
-    public Optional<Donation> getDonationById(Long id) {
-        return donationRepository.findByIdOptional(id);
-    }
-
-    /**
-     * Get all donations
-     */
-    public List<Donation> getAllDonations() {
-        return donationRepository.listAll();
-    }
-
-    /**
-     * Get all completed donations
-     */
-    public List<Donation> getCompletedDonations() {
-        return donationRepository.findCompleted();
-    }
-
-    /**
-     * Get donations by email
-     */
-    public List<Donation> getDonationsByEmail(String email) {
-        return donationRepository.findByEmail(email);
-    }
-
-    /**
-     * Get pending donations (waiting for PayPal)
-     */
-    public List<Donation> getPendingDonations() {
-        return donationRepository.findPending();
-    }
-
-    /**
      * Find donation by PayPal order ID
      */
     public Donation findByPaypalOrderId(String orderId) {
@@ -75,7 +40,7 @@ public class DonationService {
      * Update donation with PayPal order ID
      */
     public void updatePaypalOrderId(Donation donation, String orderId) {
-        log.infof("PayPal order created successfully for donation %d with PayPal order ID %s", donation.getId(), orderId);
+        log.infof("PayPal order created successfully for donation %s with PayPal order ID %s", donation.getUuid(), orderId);
         donation.getPaypalInfo().setOrderId(orderId);
         donation.getPaypalInfo().setCreatedAt(LocalDateTime.now());
         donation.getPaypalInfo().setUpdatedAt(LocalDateTime.now());
@@ -85,9 +50,9 @@ public class DonationService {
     /**
      * Capture donation from PayPal
      */
-    public Donation captureDonation(Donation donation, String transactionId, String paypalEmail, String payerId, String responseData) {
-        log.infof("Capturing donation %d with PayPal transaction %s", donation.getId(), transactionId);
-        donation.getPaypalInfo().setTransactionId(transactionId);
+    public Donation captureDonation(Donation donation, String captureId, String paypalEmail, String payerId, String responseData) {
+        log.infof("Capturing donation %s with PayPal capture ID %s", donation.getUuid(), captureId);
+        donation.getPaypalInfo().setCaptureId(captureId);
         donation.getPaypalInfo().setEmail(paypalEmail);
         donation.getPaypalInfo().setPayerId(payerId);
         donation.getPaypalInfo().setStatus("COMPLETED");
@@ -101,7 +66,7 @@ public class DonationService {
      * Mark donation as failed
      */
     public void failDonation(Donation donation, String errorMessage) {
-        log.infof("Marking donation %d as FAILED: %s", donation.getId(), errorMessage);
+        log.infof("Marking donation %s as FAILED: %s", donation.getUuid(), errorMessage);
         donation.getPaypalInfo().setStatus("FAILED");
         donation.getPaypalInfo().setErrorMessage(errorMessage);
         donation.setUpdatedAt(LocalDateTime.now());
@@ -115,18 +80,11 @@ public class DonationService {
     }
 
     /**
-     * Count total donations
+     * Get total amount donated from completed donations only
      */
-    public long countDonations() {
-        return donationRepository.count();
-    }
-
-    /**
-     * Get total amount donated
-     */
-    public BigDecimal getTotalAmount() {
-        List<Donation> donations = donationRepository.listAll();
-        return donations.stream()
+    public BigDecimal getTotalCompletedAmount() {
+        List<Donation> completedDonations = donationRepository.findCompleted();
+        return completedDonations.stream()
                 .map(Donation::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }

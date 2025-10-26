@@ -41,12 +41,10 @@ public class PayPalOrderRequest {
         this.applicationContext = new ApplicationContext(returnUrl, cancelUrl);
     }
 
-    // Getters
     public String getIntent() { return intent; }
     public PurchaseUnit[] getPurchaseUnits() { return purchaseUnits; }
     public Payer getPayer() { return payer; }
 
-    // Inner classes
     public static class PurchaseUnit {
         @JsonProperty("amount")
         public Amount amount;

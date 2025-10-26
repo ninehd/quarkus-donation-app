@@ -63,8 +63,8 @@ public class DonationResource {
     @Path("/api/donations/stats")
     @Produces(MediaType.APPLICATION_JSON)
     public StatsDTO getStats() {
-        long totalDonations = donationService.countDonations();
-        BigDecimal totalAmount = donationService.getTotalAmount();
+        long totalDonations = donationService.countCompletedDonations();
+        BigDecimal totalAmount = donationService.getTotalCompletedAmount();
         return new StatsDTO(totalDonations, totalAmount);
     }
 
@@ -123,7 +123,7 @@ public class DonationResource {
 
             // Check if already captured in database
             if (PayPalOrderStatus.isCompleted(donation.getPaypalInfo().getStatus())) {
-                log.infof("Donation %d already completed in database, displaying success page", donation.getId());
+                log.infof("Donation %s already completed in database, displaying success page", donation.getUuid());
                 String paypalEmail = donation.getPaypalInfo().getEmail();
                 String maskedEmail = StringUtils.maskEmail(paypalEmail != null ? paypalEmail : donation.getDonorEmail());
 
@@ -141,7 +141,7 @@ public class DonationResource {
             String paypalStatusString = orderDetails.getStatus();
             PayPalOrderStatus paypalStatus = PayPalOrderStatus.fromString(paypalStatusString);
 
-            log.infof("PayPal order status for donation %d: %s", donation.getId(), paypalStatusString);
+            log.infof("PayPal order status for donation %s: %s", donation.getUuid(), paypalStatusString);
 
             // Check if payment can be captured
             if (paypalStatus != null && paypalStatus.canBeCaptured()) {

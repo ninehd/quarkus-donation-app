@@ -32,7 +32,7 @@ public class PayPalService {
      * Initiate a donation by creating a PayPal order
      */
     public PayPalOrderResponse initiateDonation(Donation donation) {
-        log.infof("Initiating PayPal payment for donation %d", donation.getId());
+        log.infof("Initiating PayPal payment for donation %s", donation.getUuid());
 
         try {
             String returnUrl = baseUrl + "/donations/paypal/return";
@@ -67,7 +67,7 @@ public class PayPalService {
      * Capture a donation after user approves on PayPal
      */
     public Donation  captureDonation(Donation donation, String paypalOrderId) {
-        log.infof("Capturing PayPal payment for donation %d with order %s", donation.getId(), paypalOrderId);
+        log.infof("Capturing PayPal payment for donation %s with order %s", donation.getUuid(), paypalOrderId);
 
         try {
             PayPalOrderResponse captureResponse = paypalClient.captureOrder(paypalOrderId, Collections.emptyMap());
@@ -75,6 +75,21 @@ public class PayPalService {
             if (captureResponse != null && captureResponse.getId() != null) {
                 String paypalEmail = null;
                 String payerId = null;
+                String captureId = null;
+
+                // Extract capture ID from purchase_units[0].payments.captures[0].id
+                if (captureResponse.getPurchaseUnits() != null && !captureResponse.getPurchaseUnits().isEmpty()) {
+                    PayPalOrderResponse.PurchaseUnit purchaseUnit = captureResponse.getPurchaseUnits().get(0);
+                    if (purchaseUnit.getPayments() != null
+                        && purchaseUnit.getPayments().getCaptures() != null
+                        && !purchaseUnit.getPayments().getCaptures().isEmpty()) {
+                        captureId = purchaseUnit.getPayments().getCaptures().get(0).getId();
+                    }
+                }
+
+                if (captureId == null || captureId.isEmpty()) {
+                    throw new RuntimeException("No capture ID found in PayPal response");
+                }
 
                 if (captureResponse.getPaymentSource() != null
                     && captureResponse.getPaymentSource().getPaypal() != null) {
@@ -89,14 +104,14 @@ public class PayPalService {
 
                 Donation captured = donationService.captureDonation(
                         donation,
-                        captureResponse.getId(),
+                        captureId,
                         paypalEmail,
                         payerId,
                         JsonUtils.toJson(captureResponse)
                 );
 
-                log.infof("Donation captured successfully. Transaction ID: %s, PayPal Email: %s, Payer ID: %s",
-                         captureResponse.getId(), paypalEmail, payerId);
+                log.infof("Donation captured successfully. Capture ID: %s, PayPal Email: %s, Payer ID: %s",
+                         captureId, paypalEmail, payerId);
                 return captured;
 
             } else {

@@ -10,8 +10,8 @@ public class PayPalTransactionInfo {
     @Column(name = "paypal_order_id")
     private String orderId;
 
-    @Column(name = "paypal_transaction_id")
-    private String transactionId;
+    @Column(name = "paypal_capture_id")
+    private String captureId;
 
     @Column(name = "paypal_email")
     private String email;
@@ -45,12 +45,12 @@ public class PayPalTransactionInfo {
         this.orderId = orderId;
     }
 
-    public String getTransactionId() {
-        return transactionId;
+    public String getCaptureId() {
+        return captureId;
     }
 
-    public void setTransactionId(String transactionId) {
-        this.transactionId = transactionId;
+    public void setCaptureId(String captureId) {
+        this.captureId = captureId;
     }
 
     public String getEmail() {

@@ -1,12 +1,13 @@
 package com.redhat.quarkus.donation.repository;
 
 import com.redhat.quarkus.donation.entity.Donation;
-import io.quarkus.hibernate.orm.panache.PanacheRepository;
+import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
+import java.util.UUID;
 
 @ApplicationScoped
-public class DonationRepository implements PanacheRepository<Donation> {
+public class DonationRepository implements PanacheRepositoryBase<Donation, UUID> {
 
     /**
      * Find donation by PayPal order ID

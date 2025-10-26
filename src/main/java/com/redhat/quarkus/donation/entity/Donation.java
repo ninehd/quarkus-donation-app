@@ -10,14 +10,16 @@ import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "donations")
 public class Donation {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "uuid")
+    private UUID uuid;
 
     @Column(name = "donor_name", nullable = false)
     private String donorName;
@@ -53,12 +55,12 @@ public class Donation {
         this.message = message;
     }
 
-    public Long getId() {
-        return id;
+    public UUID getUuid() {
+        return uuid;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setUuid(UUID id) {
+        this.uuid = id;
     }
 
     public String getDonorName() {
@@ -128,7 +130,7 @@ public class Donation {
     @Override
     public String toString() {
         return "Donation{" +
-                "id=" + id +
+                "uuid=" + uuid +
                 ", donorName='" + donorName + '\'' +
                 ", donorEmail='" + donorEmail + '\'' +
                 ", amount=" + amount +

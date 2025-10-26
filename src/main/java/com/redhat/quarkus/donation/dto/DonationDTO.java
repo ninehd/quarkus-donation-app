@@ -4,10 +4,11 @@ import com.redhat.quarkus.donation.entity.Donation;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public class DonationDTO {
 
-    private Long id;
+    private UUID uuid;
 
     private String donorName;
 
@@ -41,14 +42,14 @@ public class DonationDTO {
 
     public static DonationDTO fromEntity(Donation donation) {
         DonationDTO dto = new DonationDTO();
-        dto.id = donation.getId();
+        dto.uuid = donation.getUuid();
         dto.donorName = donation.getDonorName();
         dto.donorEmail = donation.getDonorEmail();
         dto.amount = donation.getAmount();
         dto.message = donation.getMessage();
 
         dto.paypalOrderId = donation.getPaypalInfo().getOrderId();
-        dto.paypalTransactionId = donation.getPaypalInfo().getTransactionId();
+        dto.paypalTransactionId = donation.getPaypalInfo().getCaptureId();
         dto.paypalEmail = donation.getPaypalInfo().getEmail();
         dto.paypalStatus = donation.getPaypalInfo().getStatus();
         dto.paypalErrorMessage = donation.getPaypalInfo().getErrorMessage();
@@ -64,12 +65,12 @@ public class DonationDTO {
         return donation;
     }
 
-    public Long getId() {
-        return id;
+    public UUID getUuid() {
+        return uuid;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public String getDonorName() {
@@ -179,7 +180,7 @@ public class DonationDTO {
     @Override
     public String toString() {
         return "DonationDTO{" +
-                "id=" + id +
+                "uuid=" + uuid +
                 ", donorName='" + donorName + '\'' +
                 ", donorEmail='" + donorEmail + '\'' +
                 ", amount=" + amount +
