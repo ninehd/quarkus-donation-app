@@ -42,7 +42,7 @@ public class PayPalService {
 
             PayPalOrderRequest request = paypalMapper.toOrderRequest(
                     donation,
-                    baseUrl + "/donations/paypal/return"
+                    baseUrl + "/api/donations/paypal/return"
             );
 
             PayPalOrderResponse response = paypalClient.createOrder(request);

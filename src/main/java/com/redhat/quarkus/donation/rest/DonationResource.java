@@ -100,7 +100,7 @@ public class DonationResource {
      * Verifies the actual payment status with PayPal API
      */
     @GET
-    @Path("/donations/paypal/return")
+    @Path("/api/donations/paypal/return")
     @Produces(MediaType.TEXT_HTML)
     @Blocking
     @Transactional
