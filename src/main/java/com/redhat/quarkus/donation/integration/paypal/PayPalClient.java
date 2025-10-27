@@ -1,5 +1,7 @@
 package com.redhat.quarkus.donation.integration.paypal;
 
+import com.redhat.quarkus.donation.integration.paypal.model.PayPalOrderRequest;
+import com.redhat.quarkus.donation.integration.paypal.model.PayPalOrderResponse;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;

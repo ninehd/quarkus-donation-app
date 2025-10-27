@@ -14,6 +14,7 @@ CREATE TABLE donations
     paypal_capture_id   VARCHAR(255),
     paypal_email        VARCHAR(255),
     paypal_payer_id     VARCHAR(255),
+    paypal_approve_link VARCHAR(255),
     paypal_status       VARCHAR(50),
     paypal_response_data TEXT,
     paypal_error_message TEXT,

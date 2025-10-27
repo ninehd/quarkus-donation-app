@@ -3,11 +3,11 @@ package com.redhat.quarkus.donation.rest;
 import com.redhat.quarkus.donation.dto.DonationDTO;
 import com.redhat.quarkus.donation.dto.StatsDTO;
 import com.redhat.quarkus.donation.entity.Donation;
-import com.redhat.quarkus.donation.integration.paypal.PayPalOrderResponse;
+import com.redhat.quarkus.donation.integration.paypal.model.PayPalOrderResponse;
 import com.redhat.quarkus.donation.integration.paypal.PayPalOrderStatus;
+import com.redhat.quarkus.donation.mapper.DonationResponseMapper;
 import com.redhat.quarkus.donation.service.DonationService;
 import com.redhat.quarkus.donation.service.PayPalService;
-import com.redhat.quarkus.donation.utils.StringUtils;
 import io.quarkus.qute.Location;
 import io.quarkus.qute.Template;
 import jakarta.inject.Inject;
@@ -25,7 +25,6 @@ import org.jboss.logging.Logger;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 @Path("/")
 public class DonationResource {
@@ -37,6 +36,9 @@ public class DonationResource {
 
     @Inject
     PayPalService paypalService;
+
+    @Inject
+    DonationResponseMapper donationResponseMapper;
 
     @Inject
     @Location("donation-form.html")
@@ -80,18 +82,11 @@ public class DonationResource {
 
         Donation donation = donationService.createDonation(donationDTO.toEntity());
 
-        PayPalOrderResponse paypalResponse = paypalService.initiateDonation(donation);
+        paypalService.initiateDonation(donation);
 
-        String approvalLink = paypalResponse.getLinks()
-                .stream()
-                .map(PayPalOrderResponse.Link::getApproveLink)
-                .filter(Objects::nonNull)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Could not retrieve PayPal approval URL"));
-
-        // Return Response with JSON
+        // Redirect to PayPal
         Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("approvalUrl", approvalLink);
+        responseBody.put("approvalUrl", donation.getPaypalInfo().getApproveLink());
 
         return Response.ok(responseBody).build();
     }
@@ -124,16 +119,7 @@ public class DonationResource {
             // Check if already captured in database
             if (PayPalOrderStatus.isCompleted(donation.getPaypalInfo().getStatus())) {
                 log.infof("Donation %s already completed in database, displaying success page", donation.getUuid());
-                String paypalEmail = donation.getPaypalInfo().getEmail();
-                String maskedEmail = StringUtils.maskEmail(paypalEmail != null ? paypalEmail : donation.getDonorEmail());
-
-                return Response.ok(donationResult.data(
-                        "success", true,
-                        "orderId", donation.getPaypalInfo().getOrderId(),
-                        "amount", donation.getAmount(),
-                        "maskedEmail", maskedEmail,
-                        "donorEmail", donation.getDonorEmail()
-                ).render()).build();
+                return Response.ok(donationResult.data(donationResponseMapper.toResult(donation, true)).render()).build();
             }
 
             // Verify status directly with PayPal API
@@ -141,34 +127,16 @@ public class DonationResource {
             String paypalStatusString = orderDetails.getStatus();
             PayPalOrderStatus paypalStatus = PayPalOrderStatus.fromString(paypalStatusString);
 
-            log.infof("PayPal order status for donation %s: %s", donation.getUuid(), paypalStatusString);
 
             // Check if payment can be captured
             if (paypalStatus != null && paypalStatus.canBeCaptured()) {
                 // Payment approved, capture it now
                 Donation captured = paypalService.captureDonation(donation, paypalOrderId);
-
-                // Get PayPal email and mask it for display
-                String paypalEmail = captured.getPaypalInfo().getEmail();
-                String maskedEmail = StringUtils.maskEmail(paypalEmail != null ? paypalEmail : captured.getDonorEmail());
-
-                // Render success page
-                return Response.ok(donationResult.data(
-                        "success", true,
-                        "orderId", captured.getPaypalInfo().getOrderId(),
-                        "amount", captured.getAmount(),
-                        "maskedEmail", maskedEmail,
-                        "donorEmail", captured.getDonorEmail()
-                ).render()).build();
+                return Response.ok(donationResult.data(donationResponseMapper.toResult(captured, true)).render()).build();
             } else {
                 // Payment was not approved (cancelled or other status)
                 donationService.failDonation(donation, "Payment not approved. Status: " + paypalStatusString);
-
-                // Render cancelled page
-                return Response.ok(donationResult.data(
-                        "success", false,
-                        "reason", "Payment status: " + paypalStatusString
-                ).render()).build();
+                return Response.ok(donationResult.data(donationResponseMapper.toResult(donation, false)).render()).build();
             }
 
         } catch (Exception e) {

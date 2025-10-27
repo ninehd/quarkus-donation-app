@@ -37,7 +37,7 @@ public class Donation {
     private String message;
 
     @Embedded
-    private PayPalTransactionInfo paypalInfo = new PayPalTransactionInfo();
+    private PayPalInfo paypalInfo = new PayPalInfo();
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -103,11 +103,11 @@ public class Donation {
         this.message = message;
     }
 
-    public PayPalTransactionInfo getPaypalInfo() {
+    public PayPalInfo getPaypalInfo() {
         return paypalInfo;
     }
 
-    public void setPaypalInfo(PayPalTransactionInfo paypalInfo) {
+    public void setPaypalInfo(PayPalInfo paypalInfo) {
         this.paypalInfo = paypalInfo;
     }
 

@@ -3,11 +3,13 @@ package com.redhat.quarkus.donation.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import org.jboss.logging.Logger;
 
 public class JsonUtils {
 
+    private static final Logger log = Logger.getLogger(JsonUtils.class);
     private static final ObjectMapper mapper = new ObjectMapper()
-            .enable(SerializationFeature.INDENT_OUTPUT); // pretty-print JSON
+            .enable(SerializationFeature.INDENT_OUTPUT);
 
     /**
      * Serialize a Java object to a JSON string
@@ -19,7 +21,7 @@ public class JsonUtils {
         try {
             return mapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
-            System.err.println("JSON serialization error: " + e.getMessage());
+            log.error("JSON serialization error", e);
             return null;
         }
     }
@@ -36,7 +38,7 @@ public class JsonUtils {
         try {
             return mapper.readValue(json, clazz);
         } catch (Exception e) {
-            System.err.println("JSON deserialization error: " + e.getMessage());
+            log.error("JSON deserialization error", e);
             return null;
         }
     }

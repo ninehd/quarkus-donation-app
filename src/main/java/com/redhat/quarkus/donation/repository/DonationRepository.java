@@ -24,20 +24,6 @@ public class DonationRepository implements PanacheRepositoryBase<Donation, UUID>
     }
 
     /**
-     * Find donations by email
-     */
-    public List<Donation> findByEmail(String email) {
-        return list("donorEmail = ?1 order by createdAt desc", email);
-    }
-
-    /**
-     * Find pending donations (waiting for PayPal)
-     */
-    public List<Donation> findPending() {
-        return list("paypalInfo.status is null or paypalInfo.status = ?1 order by createdAt desc", "PENDING");
-    }
-
-    /**
      * Count completed donations
      */
     public long countCompleted() {

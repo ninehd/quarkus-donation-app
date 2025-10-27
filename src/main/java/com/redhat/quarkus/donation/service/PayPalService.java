@@ -2,9 +2,10 @@ package com.redhat.quarkus.donation.service;
 
 import com.redhat.quarkus.donation.entity.Donation;
 import com.redhat.quarkus.donation.integration.paypal.PayPalClient;
-import com.redhat.quarkus.donation.integration.paypal.PayPalOrderRequest;
-import com.redhat.quarkus.donation.integration.paypal.PayPalOrderResponse;
-import com.redhat.quarkus.donation.utils.JsonUtils;
+import com.redhat.quarkus.donation.integration.paypal.model.PayPalOrderRequest;
+import com.redhat.quarkus.donation.integration.paypal.model.PayPalOrderResponse;
+import com.redhat.quarkus.donation.integration.paypal.PayPalOrderStatus;
+import com.redhat.quarkus.donation.mapper.PayPalOrderMapper;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -25,33 +26,36 @@ public class PayPalService {
     @Inject
     DonationService donationService;
 
+    @Inject
+    PayPalOrderMapper paypalMapper;
+
     @ConfigProperty(name = "app.base-url")
     String baseUrl;
 
     /**
      * Initiate a donation by creating a PayPal order
      */
-    public PayPalOrderResponse initiateDonation(Donation donation) {
+    public void initiateDonation(Donation donation) {
         log.infof("Initiating PayPal payment for donation %s", donation.getUuid());
 
         try {
-            String returnUrl = baseUrl + "/donations/paypal/return";
-            String cancelUrl = baseUrl + "/donations/paypal/return";
 
-            PayPalOrderRequest request = new PayPalOrderRequest(
-                    donation.getAmount().toString(),
-                    donation.getCurrency(),
-                    donation.getDonorEmail(),
-                    returnUrl,
-                    cancelUrl,
-                    "My wonderful contribution"
+            PayPalOrderRequest request = paypalMapper.toOrderRequest(
+                    donation,
+                    baseUrl + "/donations/paypal/return"
             );
 
             PayPalOrderResponse response = paypalClient.createOrder(request);
 
             if (response != null && response.getId() != null) {
-                donationService.updatePaypalOrderId(donation, response.getId());
-                return response;
+                // Use mapper to update donation with PayPal order response
+                paypalMapper.updateDonationFromOrderResponse(donation, response);
+
+                // Validate approve link was extracted
+                if (donation.getPaypalInfo().getApproveLink() == null) {
+                    throw new RuntimeException("Could not retrieve PayPal approval URL");
+                }
+
             } else {
                 throw new RuntimeException("Invalid PayPal response: no order ID");
             }
@@ -66,56 +70,19 @@ public class PayPalService {
     /**
      * Capture a donation after user approves on PayPal
      */
-    public Donation  captureDonation(Donation donation, String paypalOrderId) {
+    public Donation captureDonation(Donation donation, String paypalOrderId) {
         log.infof("Capturing PayPal payment for donation %s with order %s", donation.getUuid(), paypalOrderId);
 
         try {
             PayPalOrderResponse captureResponse = paypalClient.captureOrder(paypalOrderId, Collections.emptyMap());
 
-            if (captureResponse != null && captureResponse.getId() != null) {
-                String paypalEmail = null;
-                String payerId = null;
-                String captureId = null;
-
-                // Extract capture ID from purchase_units[0].payments.captures[0].id
-                if (captureResponse.getPurchaseUnits() != null && !captureResponse.getPurchaseUnits().isEmpty()) {
-                    PayPalOrderResponse.PurchaseUnit purchaseUnit = captureResponse.getPurchaseUnits().get(0);
-                    if (purchaseUnit.getPayments() != null
-                        && purchaseUnit.getPayments().getCaptures() != null
-                        && !purchaseUnit.getPayments().getCaptures().isEmpty()) {
-                        captureId = purchaseUnit.getPayments().getCaptures().get(0).getId();
-                    }
-                }
-
-                if (captureId == null || captureId.isEmpty()) {
-                    throw new RuntimeException("No capture ID found in PayPal response");
-                }
-
-                if (captureResponse.getPaymentSource() != null
-                    && captureResponse.getPaymentSource().getPaypal() != null) {
-                    PayPalOrderResponse.PayPalPaymentSource paypalSource = captureResponse.getPaymentSource().getPaypal();
-                    paypalEmail = paypalSource.getEmailAddress();
-                    payerId = paypalSource.getAccountId();
-                }
-
-                if (paypalEmail == null || paypalEmail.isEmpty()) {
-                    paypalEmail = donation.getDonorEmail();
-                }
-
-                Donation captured = donationService.captureDonation(
-                        donation,
-                        captureId,
-                        paypalEmail,
-                        payerId,
-                        JsonUtils.toJson(captureResponse)
-                );
-
-                log.infof("Donation captured successfully. Capture ID: %s, PayPal Email: %s, Payer ID: %s",
-                         captureId, paypalEmail, payerId);
-                return captured;
+            if (captureResponse != null && PayPalOrderStatus.isCompleted(captureResponse.getStatus())) {
+                log.infof("PayPal payment status for donation %s: %s", donation.getUuid(), captureResponse.getStatus());
+                paypalMapper.updateDonationFromCaptureResponse(donation, captureResponse);
+                return donation;
 
             } else {
-                throw new RuntimeException("Invalid capture response from PayPal");
+                throw new RuntimeException("Invalid capture response from PayPal for donation " + donation.getUuid());
             }
 
         } catch (Exception e) {
@@ -135,7 +102,7 @@ public class PayPalService {
             PayPalOrderResponse orderDetails = paypalClient.getOrder(paypalOrderId);
 
             if (orderDetails != null) {
-                log.infof("PayPal order status: %s", orderDetails.getStatus());
+                log.infof("PayPal order status for order %s: %s", paypalOrderId, orderDetails.getStatus());
                 return orderDetails;
             } else {
                 throw new RuntimeException("Could not fetch order details from PayPal");

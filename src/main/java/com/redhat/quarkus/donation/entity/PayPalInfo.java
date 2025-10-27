@@ -5,11 +5,11 @@ import jakarta.persistence.Column;
 import java.time.LocalDateTime;
 
 @Embeddable
-public class PayPalTransactionInfo {
+public class PayPalInfo {
 
     @Column(name = "paypal_order_id")
     private String orderId;
-
+    
     @Column(name = "paypal_capture_id")
     private String captureId;
 
@@ -19,6 +19,9 @@ public class PayPalTransactionInfo {
     @Column(name = "paypal_payer_id")
     private String payerId;
 
+    @Column(name = "paypal_approve_link")
+    private String approveLink;
+    
     @Column(name = "paypal_status")
     private String status;
 
@@ -34,7 +37,7 @@ public class PayPalTransactionInfo {
     @Column(name = "paypal_updated_at")
     private LocalDateTime updatedAt;
 
-    public PayPalTransactionInfo() {
+    public PayPalInfo() {
     }
 
     public String getOrderId() {
@@ -67,6 +70,14 @@ public class PayPalTransactionInfo {
 
     public void setPayerId(String payerId) {
         this.payerId = payerId;
+    }
+
+    public String getApproveLink() {
+        return approveLink;
+    }
+
+    public void setApproveLink(String approveLink) {
+        this.approveLink = approveLink;
     }
 
     public String getStatus() {
@@ -112,8 +123,11 @@ public class PayPalTransactionInfo {
 
     @Override
     public String toString() {
-        return "PayPalTransactionInfo{" +
+        return "PayPalInfo{" +
                 "orderId='" + orderId + '\'' +
+                ", captureId='" + captureId + '\'' +
+                ", email='" + email + '\'' +
+                ", payerId='" + payerId + '\'' +
                 ", status='" + status + '\'' +
                 '}';
     }

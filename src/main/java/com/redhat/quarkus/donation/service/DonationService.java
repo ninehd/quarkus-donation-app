@@ -9,8 +9,6 @@ import org.jboss.logging.Logger;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @ApplicationScoped
 public class DonationService {
@@ -34,32 +32,6 @@ public class DonationService {
      */
     public Donation findByPaypalOrderId(String orderId) {
         return donationRepository.findByPaypalOrderId(orderId);
-    }
-
-    /**
-     * Update donation with PayPal order ID
-     */
-    public void updatePaypalOrderId(Donation donation, String orderId) {
-        log.infof("PayPal order created successfully for donation %s with PayPal order ID %s", donation.getUuid(), orderId);
-        donation.getPaypalInfo().setOrderId(orderId);
-        donation.getPaypalInfo().setCreatedAt(LocalDateTime.now());
-        donation.getPaypalInfo().setUpdatedAt(LocalDateTime.now());
-    }
-
-
-    /**
-     * Capture donation from PayPal
-     */
-    public Donation captureDonation(Donation donation, String captureId, String paypalEmail, String payerId, String responseData) {
-        log.infof("Capturing donation %s with PayPal capture ID %s", donation.getUuid(), captureId);
-        donation.getPaypalInfo().setCaptureId(captureId);
-        donation.getPaypalInfo().setEmail(paypalEmail);
-        donation.getPaypalInfo().setPayerId(payerId);
-        donation.getPaypalInfo().setStatus("COMPLETED");
-        donation.getPaypalInfo().setResponseData(responseData);
-        donation.getPaypalInfo().setCreatedAt(java.time.LocalDateTime.now());
-        donation.setUpdatedAt(LocalDateTime.now());
-        return donation;
     }
 
     /**
