@@ -10,6 +10,7 @@ import com.redhat.quarkus.donation.service.DonationService;
 import com.redhat.quarkus.donation.service.PayPalService;
 import io.quarkus.qute.Location;
 import io.quarkus.qute.Template;
+import io.smallrye.common.annotation.Blocking;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
@@ -64,6 +65,7 @@ public class DonationResource {
     @GET
     @Path("/api/donations/stats")
     @Produces(MediaType.APPLICATION_JSON)
+    @Blocking
     public StatsDTO getStats() {
         long totalDonations = donationService.countCompletedDonations();
         BigDecimal totalAmount = donationService.getTotalCompletedAmount();
@@ -76,6 +78,7 @@ public class DonationResource {
     @POST
     @Path("/api/donations/paypal/initiate")
     @Consumes(MediaType.APPLICATION_JSON)
+    @Blocking
     @Transactional
     public Response initiateDonation(DonationDTO donationDTO) {
         log.infof("Initiating donation for %s with amount %s", donationDTO.getDonorEmail(), donationDTO.getAmount());
@@ -99,6 +102,7 @@ public class DonationResource {
     @GET
     @Path("/donations/paypal/return")
     @Produces(MediaType.TEXT_HTML)
+    @Blocking
     @Transactional
     public Response handlePayPalReturn(
             @QueryParam("token") String paypalOrderId,

@@ -26,5 +26,4 @@ CREATE TABLE donations
 
 CREATE INDEX IF NOT EXISTS idx_donor_email ON donations (donor_email);
 CREATE INDEX IF NOT EXISTS idx_paypal_order_id ON donations (paypal_order_id);
-CREATE INDEX IF NOT EXISTS idx_paypal_status ON donations (paypal_status);
-CREATE INDEX IF NOT EXISTS idx_created_at ON donations (created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_paypal_status_created_at ON donations (paypal_status, created_at DESC);

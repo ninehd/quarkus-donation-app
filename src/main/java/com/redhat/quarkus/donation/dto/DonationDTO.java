@@ -20,10 +20,8 @@ public class DonationDTO {
 
     // PayPal fields
     private String paypalOrderId;
-    private String paypalTransactionId;
+    private String paypalCaptureId;
     private String paypalEmail;
-    private BigDecimal paypalAmount;
-    private String paypalCurrency;
     private String paypalStatus;
     private String paypalErrorMessage;
 
@@ -49,7 +47,7 @@ public class DonationDTO {
         dto.message = donation.getMessage();
 
         dto.paypalOrderId = donation.getPaypalInfo().getOrderId();
-        dto.paypalTransactionId = donation.getPaypalInfo().getCaptureId();
+        dto.paypalCaptureId = donation.getPaypalInfo().getCaptureId();
         dto.paypalEmail = donation.getPaypalInfo().getEmail();
         dto.paypalStatus = donation.getPaypalInfo().getStatus();
         dto.paypalErrorMessage = donation.getPaypalInfo().getErrorMessage();
@@ -59,10 +57,8 @@ public class DonationDTO {
         return dto;
     }
 
-    // Factory method: convert DTO to Donation entity
     public Donation toEntity() {
-        Donation donation = new Donation(donorName, donorEmail, amount, message);
-        return donation;
+        return new Donation(donorName, donorEmail, amount, message);
     }
 
     public UUID getUuid() {
@@ -113,12 +109,12 @@ public class DonationDTO {
         this.paypalOrderId = paypalOrderId;
     }
 
-    public String getPaypalTransactionId() {
-        return paypalTransactionId;
+    public String getPaypalCaptureId() {
+        return paypalCaptureId;
     }
 
-    public void setPaypalTransactionId(String paypalTransactionId) {
-        this.paypalTransactionId = paypalTransactionId;
+    public void setPaypalCaptureId(String paypalCaptureId) {
+        this.paypalCaptureId = paypalCaptureId;
     }
 
     public String getPaypalEmail() {
@@ -127,22 +123,6 @@ public class DonationDTO {
 
     public void setPaypalEmail(String paypalEmail) {
         this.paypalEmail = paypalEmail;
-    }
-
-    public BigDecimal getPaypalAmount() {
-        return paypalAmount;
-    }
-
-    public void setPaypalAmount(BigDecimal paypalAmount) {
-        this.paypalAmount = paypalAmount;
-    }
-
-    public String getPaypalCurrency() {
-        return paypalCurrency;
-    }
-
-    public void setPaypalCurrency(String paypalCurrency) {
-        this.paypalCurrency = paypalCurrency;
     }
 
     public String getPaypalStatus() {
