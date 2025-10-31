@@ -26,4 +26,10 @@ public class PayPalOrderResponse {
     public List<Link> getLinks() { return links; }
     public PaymentSource getPaymentSource() { return paymentSource; }
     public List<PurchaseUnit> getPurchaseUnits() { return purchaseUnits; }
+
+    public void setId(String id) { this.id = id; }
+    public void setStatus(String status) { this.status = status; }
+    public void setLinks(List<Link> links) { this.links = links; }
+    public void setPaymentSource(PaymentSource paymentSource) { this.paymentSource = paymentSource; }
+    public void setPurchaseUnits(List<PurchaseUnit> purchaseUnits) { this.purchaseUnits = purchaseUnits; }
 }
